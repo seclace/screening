@@ -1,0 +1,194 @@
+.users-container {
+  padding: 50px 0 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.users {
+  font-size: 14px;
+  position: relative;
+}
+
+.users table {
+  background-color: rgb(235, 235, 235);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+}
+
+.users th {
+  background: #aaa;
+  text-align: center;
+}
+
+.users th.have-sort,
+.users th.sort-disabled {
+  padding: 10px 0;
+  position: relative;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.users th.sort-disabled {
+  cursor: not-allowed;
+}
+
+.users th.sort-disabled:hover,
+.users th.have-sort:hover,
+.users th.have-sort.desc,
+.users th.have-sort.asc {
+  color: #fff;
+  background-color: rgb(77, 139, 253);
+}
+
+.users th.have-sort:after {
+  position: absolute;
+  content: '';
+  top: 21px;
+  right: 10px;
+  border-top: 8px solid black;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.users th.have-sort:before {
+  position: absolute;
+  content: '';
+  top: 9px;
+  right: 10px;
+  border-bottom: 8px solid black;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.users th.have-sort.desc:after {
+  border-top-color: #fff;
+}
+
+.users th.have-sort.asc:before {
+  border-bottom-color: #fff;
+}
+
+.users td {
+  padding: 10px;
+  text-align: center;
+}
+
+.users tbody tr:nth-child(2n) {
+  background-color: rgb(205, 205, 205);
+}
+
+.users .users-record {
+  transition: all .2s ease;
+  cursor: pointer;
+}
+
+.users .users-record:hover {
+  background-color: rgb(77, 139, 253);
+  color: #fff;
+}
+
+.users input {
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  box-shadow: none;
+}
+
+.users .DateRangePickerInput {
+  border: 1px solid #ccc;
+  width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.users .DateRangeInput {
+  flex: 1;
+}
+
+.users input.DateInput_input {
+  border: 0;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* Pagination CSS */
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+
+.pagination .page {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  margin-left: 10px;
+  background-color: rgb(205, 205, 205);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+  transition: all .2s ease;
+  font-size: 16px;
+  color: #000;
+}
+
+.pagination .page.active,
+.pagination .page:hover {
+  background-color: rgb(77, 139, 253);
+  color: #fff;
+}
+
+.pagination .page.disabled {
+  cursor: not-allowed;
+}
+
+.pagination .prev.disabled:hover,
+.pagination .next.disabled:hover {
+  background-color: rgb(142, 157, 255);
+}
+
+/* Loader CSS */
+.loader {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, .7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
