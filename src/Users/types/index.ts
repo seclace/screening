@@ -66,4 +66,4 @@ export type OrderBy = {
 
 export type MappedOrderBy = [FieldID, Order['descending'] | Order['ascending']] | [];
 
-export type StartAfter = Array<firebase.firestore.QueryDocumentSnapshot | undefined>;
+export type StartAfter = Array<any>;

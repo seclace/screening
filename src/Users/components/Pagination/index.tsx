@@ -8,10 +8,11 @@ interface PaginationProps {
 }
 
 function Pagination ({ loadPage, page, pagesCount }: PaginationProps) {
+  const endReached = page + 1 >= pagesCount;
   const loadFirst = () => page > 0 && loadPage(0);
   const loadPrev = () => page > 0 && loadPage(page - 1);
-  const loadNext = () => page + 1 < pagesCount && loadPage(page + 1);
-  const loadLast = () => page + 1 < pagesCount && loadPage(pagesCount - 1);
+  const loadNext = () => !endReached && loadPage(page + 1);
+  const loadLast = () => !endReached && loadPage(pagesCount - 1);
   const pages = [];
   for (let i = 0; i < pagesCount; i++) {
   	const active = i === page;
@@ -24,11 +25,11 @@ function Pagination ({ loadPage, page, pagesCount }: PaginationProps) {
   }
   return (
     <div className='pagination'>
-      <div className='page' onClick={loadFirst}>{'<<'}</div>
-      <div className='page' onClick={loadPrev}>{'<'}</div>
+      { page > 0 && <div className='page' onClick={loadFirst}>{'<<'}</div> }
+      { page > 0 && <div className='page' onClick={loadPrev}>{'<'}</div> }
       {pages}
-      <div className='page' onClick={loadNext}>{'>'}</div>
-      <div className='page' onClick={loadLast}>{'>>'}</div>
+      { !endReached && <div className='page' onClick={loadNext}>{'>'}</div> }
+      { !endReached && <div className='page' onClick={loadLast}>{'>>'}</div> }
     </div>
   )
 }

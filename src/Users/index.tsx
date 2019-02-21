@@ -2,15 +2,19 @@ import React, { Component } from 'react';
 import throttle from 'lodash.throttle';
 import omit from 'lodash.omit';
 import { withFirestore } from 'react-redux-firebase';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 import { mapFilters, mapOrderBys, findMaxOrdersPriority } from './utils';
 import Loader from './components/Loader';
 import Pagination from './components/Pagination';
 import UsersTable from './components/UsersTable';
-import { Filter, FieldID, MappedOrderBy, StartAfter, MappedFilter, OrderBy } from './types';
 import { PER_PAGE, WAIT_BEFORE_APPLY, ORDER, FIELDS } from './consts';
+import { Filter, FieldID, MappedOrderBy, StartAfter, MappedFilter, OrderBy, User } from './types';
+import { State } from '../Store/types';
 import './index.css';
 
 interface UsersListProps {
+  users: Array<User>,
   firestore: firebase.firestore.Firestore & {
     get: ({}) => Promise<firebase.firestore.QuerySnapshot>,
   },
@@ -25,6 +29,7 @@ interface UsersListState {
     [path: string]: OrderBy,
   },
   page: number,
+  usersEndReached: boolean,
 }
 
 const initialFilters = {};
@@ -40,6 +45,7 @@ class UsersList extends Component<UsersListProps, UsersListState> {
       filters: initialFilters,
       orderBy: initialOrderBy,
       page: 0,
+      usersEndReached: false,
     };
     this.loadUsers = this.loadUsers.bind(this);
     this.preparePagingData = this.preparePagingData.bind(this);
@@ -56,7 +62,6 @@ class UsersList extends Component<UsersListProps, UsersListState> {
     const { firestore } = this.props;
     const { startAfter, page } = this.state;
     try {
-      if (page === 0) await this.preparePagingData();
       const getUsersParams = {
         collection: 'users',
         startAfter: startAfter[page],
@@ -64,29 +69,20 @@ class UsersList extends Component<UsersListProps, UsersListState> {
         limit: PER_PAGE,
         where: this.getFilters(),
       };
-      await firestore.get(getUsersParams);
-      this.setState({ loading: false });
+      const users = await firestore.get(getUsersParams);
+      this.setState({ loading: false }, () => this.preparePagingData(users));
     } catch (err) {
       console.log(err)
       this.setState({ loading: false });
     }
   }
 
-  async preparePagingData (): Promise<void> {
-    const { firestore } = this.props;
-    const orderBy = this.getOrderBy();
-    let getUsers = firestore.collection('users');
-    if (orderBy.length) orderBy.forEach(o => {
-      if (!o.length) return;
-      getUsers = getUsers.orderBy(o[0], o[1]) as firebase.firestore.CollectionReference;
-    })
-    this.getFilters().forEach(([path, opStr, value]) => {
-      getUsers = getUsers.where(path, opStr, value) as firebase.firestore.CollectionReference;
-    });
-    const users: Array<firebase.firestore.QueryDocumentSnapshot> = await getUsers.get().then(v => v.docs);
-    const startAfter: StartAfter = users.filter((doc, index) => (index + 1) % 10 === 0);
-    if (users.length) startAfter.unshift(undefined);
-    this.setState({ startAfter });
+  async preparePagingData (users: firebase.firestore.QuerySnapshot): Promise<void> {
+    const { startAfter, page } = this.state;
+    if (page < startAfter.length - 1) return;
+    const nextStartAfter: StartAfter = users.docs.filter((doc, index) => (index + 1) % PER_PAGE === 0);
+    if (users.size && !startAfter.length) nextStartAfter.unshift(undefined);
+    this.setState({ startAfter: [...startAfter, ...nextStartAfter] });
   }
 
   getFilters = (): Array<MappedFilter> => {
@@ -185,4 +181,11 @@ class UsersList extends Component<UsersListProps, UsersListState> {
   }
 }
 
-export default withFirestore(UsersList);
+const withFirestoreAndUsers = compose(
+  withFirestore,
+  connect((state: State) => ({
+    users: state.firestore.ordered.users,
+  })),
+);
+
+export default withFirestoreAndUsers(UsersList);
