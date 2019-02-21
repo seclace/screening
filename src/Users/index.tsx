@@ -98,16 +98,19 @@ class UsersList extends Component<UsersListProps, UsersListState> {
   }
 
   changeFilter = (value: any, filterId: FieldID, condition: firebase.firestore.WhereFilterOp = '=='): void => {
-    const filter: Filter = { value, condition }
-    let nextFilters = { ...this.state.filters, [filterId]: filter };
+    const { filters, orderBy } = this.state;
+    const filter: Filter = { value, condition };
+    let nextFilters = { ...filters, [filterId]: filter };
     const filterByLastActive = filterId === FIELDS.lastActiveEnd || filterId === FIELDS.lastActiveStart;
-    const sorted = filterByLastActive ? FIELDS.lastActive in this.state.orderBy : filterId in this.state.orderBy;
+    const sorted = filterByLastActive ? FIELDS.lastActive in orderBy : filterId in orderBy;
     if (!value)
       nextFilters = omit(nextFilters, [filterId]);
     else if (sorted && !filterByLastActive)
       this.applyOrder(initialOrderBy);
-    else if (filterByLastActive)
-      this.applyOrder({ ...this.state.orderBy, [FIELDS.lastActive]: { order: ORDER.ascending, priority: 0 } });
+    else if (filterByLastActive) {
+      const order = sorted ? orderBy[FIELDS.lastActive].order : ORDER.ascending;
+      this.applyOrder({ [FIELDS.lastActive]: { order, priority: 0 } });
+    }
 
     this.applyFilters(nextFilters);
   }
@@ -125,7 +128,7 @@ class UsersList extends Component<UsersListProps, UsersListState> {
 
   changeOrderIfUnsorted = (sortId: FieldID): void => {
     const { orderBy, filters } = this.state;
-    const nextOrderBy = omit(orderBy, [sortId]);
+    const nextOrderBy: { [path: string]: OrderBy } = {};
     const isLastActive = sortId === FIELDS.lastActive;
     const filtered = isLastActive ? this.lastActiveFiltered() : sortId in filters;
     nextOrderBy[sortId] = {
@@ -138,7 +141,7 @@ class UsersList extends Component<UsersListProps, UsersListState> {
   changeOrderIfSorted = (sortId: FieldID): void => {
     const { orderBy, filters } = this.state;
     const { order, priority } = orderBy[sortId];
-    const nextOrderBy = omit(orderBy, [sortId]);
+    const nextOrderBy: { [path: string]: OrderBy } = {};
     const isLastActive = sortId === FIELDS.lastActive;
     const filtered = isLastActive ? this.lastActiveFiltered() : sortId in filters;
     const ascending = order === ORDER.ascending;
