@@ -24,9 +24,7 @@ export function mapOrderBys (orders: { [path: string]: OrderBy }): Array<MappedO
     return orders[orderPathA].priority - orders[orderPathB].priority;
   }
 
-  const sortedOrders = Object.keys(orders).sort(sortOrdersByPriority);
-  console.log('sortedOrders', sortedOrders)
-  return sortedOrders.map((path: string): MappedOrderBy => {
+  return Object.keys(orders).sort(sortOrdersByPriority).map((path: string): MappedOrderBy => {
     const { order } = orders[path];
     return [path as FieldID, order];
   });
