@@ -13,7 +13,6 @@ function User ({ user }: UserProps) {
       <td>{user.firstName}</td>
       <td>{user.surname}</td>
       <td>{user.email}</td>
-      <td>{}</td>
       <td>{user.account.residenceCountry}</td>
       <td>{user.account.residenceCity}</td>
       <td>{formatLastActive(user.lastActive)}</td>

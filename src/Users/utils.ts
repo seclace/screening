@@ -1,4 +1,4 @@
-import { Filter } from './types';
+import { Filter, MappedFilter, MappedOrderBy, FieldID, OrderBy } from './types';
 import { FIELDS } from './consts';
 
 export function rjust (input: number): string {
@@ -10,11 +10,28 @@ export function formatLastActive (lastActive: number): string {
   return `${rjust(date.getUTCDate())}/${rjust(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`
 }
 
-export function mapFilters (filters: { [path: string]: Filter }): Array<[string, firebase.firestore.WhereFilterOp, any]> {
-  return Object.keys(filters).map((path: string): [string, firebase.firestore.WhereFilterOp, any] => {
+export function mapFilters (filters: { [path: string]: Filter }): Array<MappedFilter> {
+  return Object.keys(filters).map((path: string): MappedFilter => {
   	let realPath = path;
   	if (path === FIELDS.lastActiveStart || path === FIELDS.lastActiveEnd) realPath = FIELDS.lastActive;
     const { condition, value } = filters[path];
     return [realPath, condition, value];
   })
+}
+
+export function mapOrderBys (orders: { [path: string]: OrderBy }): Array<MappedOrderBy> {
+  function sortOrdersByPriority (orderPathA: string, orderPathB: string): number {
+    return orders[orderPathA].priority - orders[orderPathB].priority;
+  }
+
+  const sortedOrders = Object.keys(orders).sort(sortOrdersByPriority);
+  console.log('sortedOrders', sortedOrders)
+  return sortedOrders.map((path: string): MappedOrderBy => {
+    const { order } = orders[path];
+    return [path as FieldID, order];
+  });
+}
+
+export function findMaxOrdersPriority (orders: { [path: string]: OrderBy }): number {
+  return Object.values(orders).map(o => o.priority).sort((a, b) => b - a)[0] || 0;
 }

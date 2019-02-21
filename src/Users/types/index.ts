@@ -29,6 +29,8 @@ export interface Filter {
   condition: firebase.firestore.WhereFilterOp,
 };
 
+export type MappedFilter = [string, firebase.firestore.WhereFilterOp, any];
+
 export type FieldID = 
   | 'firstName'
   | 'surname'
@@ -57,6 +59,11 @@ export type Order = {
   descending: 'desc',
 };
 
-export type OrderBy = [FieldID, Order["descending"] | Order["ascending"]] | [];
+export type OrderBy = {
+  order: Order['descending'] | Order['ascending'],
+  priority: number,
+};
 
-export type StartAfter = Array<firebase.firestore.QueryDocumentSnapshot | undefined>
+export type MappedOrderBy = [FieldID, Order['descending'] | Order['ascending']] | [];
+
+export type StartAfter = Array<firebase.firestore.QueryDocumentSnapshot | undefined>;

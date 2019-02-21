@@ -3,7 +3,7 @@ import { DateRangePicker } from 'react-dates';
 import { Moment } from 'moment';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
-import { FIELDS, RANGED_PREFIX } from '../../../../consts';
+import { FIELDS } from '../../../../consts';
 import { FieldID } from '../../../../types';
 
 interface FiltersProps {
@@ -33,19 +33,15 @@ class Filters extends Component<FiltersProps, FiltersState> {
   }
 
   render () {
-    const { onChange } = this.props;
     return (
       <tr>
         <td></td>
         {this.renderFilterCell(FIELDS.firstName)}
         {this.renderFilterCell(FIELDS.surname)}
         {this.renderFilterCell(FIELDS.email)}
-        {this.renderFilterCell(FIELDS.phoneNumber)}
         {this.renderFilterCell(FIELDS.residenceCountry)}
         {this.renderFilterCell(FIELDS.residenceCity)}
         <td>
-          {/*<input onChange={(e: { target: { value: string } }) => onChange(e.target.value, FIELDS.lastActive)}/>*/}
-
           <DateRangePicker
             isOutsideRange={() => false}
             startDate={this.state.startDate}
@@ -54,8 +50,7 @@ class Filters extends Component<FiltersProps, FiltersState> {
             endDateId='end-date'
             focusedInput={this.state.focusedInput}
             onFocusChange={focusedInput => this.setState({ focusedInput })}
-            onDatesChange={this.handleDatesChange}
-          />
+            onDatesChange={this.handleDatesChange}/>
         </td>
       </tr>
     )

@@ -11,7 +11,9 @@ interface UsersTableProps {
   users: Array<UserType>,
   changeFilter: (value: string, filterId: FieldID) => void,
   changeOrder: (filterId: FieldID) => void,
-  orderBy: OrderBy,
+  orderBy: {
+    [path: string]: OrderBy,
+  },
   filters: {
   	[path: string]: Filter,
   },
@@ -44,7 +46,6 @@ class UsersTable extends Component<UsersTableProps> {
           {this.renderSortCell(FIELDS.firstName, 'First Name')}
           {this.renderSortCell(FIELDS.surname, 'Second Name')}
           {this.renderSortCell(FIELDS.email, 'Email')}
-          {this.renderSortCell(FIELDS.phoneNumber, 'Phone Number')}
           {this.renderSortCell(FIELDS.residenceCountry, 'Residence Country')}
           {this.renderSortCell(FIELDS.residenceCity, 'Residence City')}
           {this.renderSortCell(FIELDS.lastActive, 'Data Last Active')}
@@ -54,13 +55,12 @@ class UsersTable extends Component<UsersTableProps> {
   }
 
   renderSortCell (sortId: FieldID, title: string): React.ReactNode {
-  	const { orderBy, filters, changeOrder} = this.props;
-    const [appliedSortId, order] = orderBy;
+  	const { orderBy, filters, changeOrder } = this.props;
+    const { order = '' } = orderBy[sortId] || {};
     const filtered = sortId in filters;
-    const filteredByLastActive = (FIELDS.lastActiveStart in filters || FIELDS.lastActiveEnd in filters) && sortId !== FIELDS.lastActive;
-    if (filtered || filteredByLastActive) return <th className='sort-disabled'>{title}</th>
+    if (filtered) return <th className='sort-disabled'>{title}</th>
 
-    const className = classNames('have-sort', { [order as string]: appliedSortId === sortId });
+    const className = classNames('have-sort', { [order as string]: sortId in orderBy });
     return (
       <th className={className} onClick={() => changeOrder(sortId)}>{title}</th>
     )
